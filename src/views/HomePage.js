@@ -3,8 +3,7 @@ import React, {
  } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import './HomePage.css';
-import AggregationPage from '../components/AggregationPage';
-import ArticlePage from '../components/ArticlePage';
+import Layout from '../routes/Layout';
 import { 
   Navbar,
   Image
@@ -14,7 +13,9 @@ class HomePage extends Component {
   
   render() {
     return (
+      
       <div>
+        hi
         <Navbar collapseOnSelect fixedTop>
           <Navbar.Header>
             <Navbar.Brand>
@@ -22,10 +23,7 @@ class HomePage extends Component {
             </Navbar.Brand>
           </Navbar.Header>
         </Navbar>
-        <Switch>
-          <Route exact path="/article/:entityId" component={ArticlePage}/>
-          <Route component={AggregationPage} />
-        </Switch>
+        <Layout />
       </div>
     );
   }

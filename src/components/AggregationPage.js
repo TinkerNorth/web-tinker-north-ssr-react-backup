@@ -10,46 +10,37 @@ import {
   Image
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom'
-
-const SPACE_ID = 'dm0i1bxzikc3'
-const ACCESS_TOKEN = '51f222821a25bbd4e496b2308c3d71e09dd531142ed690d5ab333feeed7c1467'
-
-var canUseDOM = !!(
-  typeof window !== 'undefined' &&
-  window.document &&
-  window.document.createElement
-);
-
-const contentful = require("contentful");
+import gql from "graphql-tag";
+import { Query } from 'react-apollo';
+ 
+const GET_AGGREGATION_PAGES = gql`
+query {
+  AggregationPages(id: "4aOf3WwFvaycCSw2q4SKWW") {
+    id
+    title
+    blogs {
+      id
+      title
+      description
+      thumbnail {
+        title
+        url
+      }
+    }
+  }
+}
+`;
+ 
 
 class AggregationPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      blogs: []
-    };
-  }
 
-  componentDidMount(){
-    const client = contentful.createClient({
-      space: SPACE_ID,
-      accessToken: ACCESS_TOKEN
-    });
-    client
-      .getEntry("4aOf3WwFvaycCSw2q4SKWW")
-      .then(entry => {
-        console.log("hi");
-        this.setState({blogs: entry.fields.blogs});
-      })
-      .catch(err => console.log(err));
-  }
   renderBlog(blog){
-    var url = '/article/' + blog.sys.id;
+    var url = '/article/' + blog.id;
     return (
       <div>
-        <Link to={url}><Image width="100%" src={blog.fields.thumbnail.fields.file.url} /></Link>
-        <h3>{blog.fields.title}</h3>
-        <p className="text-justify">{blog.fields.description}</p>
+        <Link to={url}><Image width="100%" src={blog.thumbnail.url} /></Link>
+        <h3>{blog.title}</h3>
+        <p className="text-justify">{blog.description}</p>
         <p>
           <Button 
             bsStyle="primary"
@@ -76,7 +67,7 @@ class AggregationPage extends Component {
               {this.renderBlog(state.blogs[index])}
             </Col>            
           </Row>;
-      }else if (index % 2 === 1 && index < state.blogs.length - 1){
+      } else if (index % 2 === 1 && index < state.blogs.length - 1){
         results[index] =
           <Row className="show-grid">
             <Col xs={12} sm={6} >
@@ -99,15 +90,24 @@ class AggregationPage extends Component {
 
   render() {
     return (
-        <Grid>
-          <Row>
-            <Col xs={0} sm={0} md={0} lg={1}></Col>
-            <Col xs={12} sm={12} md={12} lg={10}>
-              {this.renderAggregationPage(this.state)}
-            </Col>
-            <Col xs={0} sm={0} md={0} lg={1}></Col>
-          </Row>
-        </Grid>
+      <Query query={GET_AGGREGATION_PAGES}>
+        {({ loading, error, data }) => {
+          if (loading || error) return null;
+          return (
+
+            <Grid>
+              <Row>
+                <Col xs={0} sm={0} md={0} lg={1}></Col>
+                <Col xs={12} sm={12} md={12} lg={10}>
+                  {this.renderAggregationPage(data.AggregationPages)}
+                </Col>
+                <Col xs={0} sm={0} md={0} lg={1}></Col>
+              </Row>
+            </Grid>
+
+          );
+        }}
+      </Query>
     );
   }
 }
