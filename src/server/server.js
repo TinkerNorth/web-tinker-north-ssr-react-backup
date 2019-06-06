@@ -14,7 +14,6 @@ import HomePage from '../views/HomePage';
 
 const ReactDOMServer = require('react-dom/server');
 const PORT = 8080
-const app = Express()
 
 function Html({ content, state }) {
   return (
@@ -36,14 +35,13 @@ function Html({ content, state }) {
         <script dangerouslySetInnerHTML={{
           __html: `window.__APOLLO_STATE__=${JSON.stringify(state).replace(/</g, '\\u003c')};`,
         }} />
+
+        <script src="/static/js/bundle.js"></script><script src="/static/js/2.374d3c9c.chunk.js" /><script src="/static/js/main.54449d98.chunk.js" />
       </body>
     </html>
   );
 }
-
-const router = Express.Router()
-const rendered = (req, res) => {
-
+const renderer = (req, res) => {
   const client = new ApolloClient({
     ssrMode: true,
     link: createHttpLink({
@@ -79,14 +77,13 @@ const rendered = (req, res) => {
 
 };
 
-// router.use('^/$', rendered); 
+const router = Express.Router()
+router.use('(^/$|^/article/*)', renderer);
+// router.use('^/static/js/*', Express.static(path.resolve(__dirname, '../../', 'build/static/js'), { maxAge: '30d' }));
+router.use(Express.static(path.resolve(__dirname, '../../', 'build'), { maxAge: '30d' }));
 
-router.use(
-  Express.static(path.resolve(__dirname, '..', 'build'), { maxAge: '30d' })
-)
-
+const app = Express()
 app.use(router);
-
 app.listen(PORT, () => {
   console.log(`SSR running on port ${PORT}`)
 })

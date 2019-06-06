@@ -13,13 +13,11 @@ class HomePage extends Component {
   
   render() {
     return (
-      
       <div>
-        hi
         <Navbar collapseOnSelect fixedTop>
           <Navbar.Header>
             <Navbar.Brand>
-              <a href="/"><Image src="logo.png" height="25px"/></a>
+              <a href="/"><Image src="/logo.png" height="25px"/></a>
             </Navbar.Brand>
           </Navbar.Header>
         </Navbar>
